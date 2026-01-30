@@ -14,6 +14,17 @@
 
 Echo Music Desktop brings the premium music listening experience to your computer. Built with Flutter, it offers a seamless interface to stream music from YouTube Music without advertisements, along with powerful desktop-centric features.
 
+## Screenshots
+
+<div align="center">
+  <img src="Screenshots/Desktop-1.png" alt="Desktop Home" width="400"/>
+  <img src="Screenshots/Desktop-2.png" alt="Desktop Player" width="400"/>
+</div>
+<div align="center">
+  <img src="Screenshots/Desktop-3.png" alt="Desktop Library" width="400"/>
+  <img src="Screenshots/Desktop-4.png" alt="Desktop Settings" width="400"/>
+</div>
+
 ## Features
 
 *   **Ad-Free Streaming:** Enjoy uninterrupted music playback.
