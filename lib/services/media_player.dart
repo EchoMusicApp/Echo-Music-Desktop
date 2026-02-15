@@ -432,6 +432,8 @@ class MediaPlayer extends ChangeNotifier {
   Future<void> playAll(List songs, {int index = 0}) async {
     if (songs.isEmpty) return;
 
+    autoFetching = true;
+
     _buttonState.value = ButtonState.loading;
     notifyListeners();
 
@@ -449,25 +451,29 @@ class MediaPlayer extends ChangeNotifier {
       // Add rest of playlist completely in background (fire and forget)
       if (songs.length > 1) {
         // Use unawaited to truly run in background
-        Future(() => _addRemainingToPlaylist(songs, index));
+        Future(() async {
+        await _addRemainingToPlaylist(songs, index);
+        autoFetching = false;
+        });
+      }
+      else {
+        autoFetching = false;
       }
     } catch (e) {
+      autoFetching = false;
       print('Error in playAll: $e');
       _buttonState.value = ButtonState.paused;
       notifyListeners();
     }
   }
 
-  // Lazy loading: only add next few songs, not entire playlist
   Future<void> _addRemainingToPlaylist(List songs, int playedIndex) async {
     try {
-      // Only preload next 3 songs to avoid hammering YouTube API
-      final int maxPreload = 3;
       int added = 0;
 
       // Add songs after the played index (next songs first)
       for (int i = playedIndex + 1;
-          i < songs.length && added < maxPreload;
+          i < songs.length;
           i++) {
         try {
           final source =
