@@ -430,9 +430,9 @@ class MediaPlayer extends ChangeNotifier {
   }
 
   Future<void> playAll(List songs, {int index = 0}) async {
-    autoFetching = true;
-
     if (songs.isEmpty) return;
+
+    autoFetching = true;
 
     _buttonState.value = ButtonState.loading;
     notifyListeners();
@@ -451,10 +451,16 @@ class MediaPlayer extends ChangeNotifier {
       // Add rest of playlist completely in background (fire and forget)
       if (songs.length > 1) {
         // Use unawaited to truly run in background
-        Future(() => _addRemainingToPlaylist(songs, index));
+        Future(() async {
+        await _addRemainingToPlaylist(songs, index);
+        autoFetching = false;
+        });
       }
-      autoFetching = false;
+      else {
+        autoFetching = false;
+      }
     } catch (e) {
+      autoFetching = false;
       print('Error in playAll: $e');
       _buttonState.value = ButtonState.paused;
       notifyListeners();
