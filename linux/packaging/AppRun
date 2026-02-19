@@ -1,3 +1,3 @@
 #!/bin/sh
 APPDIR="$(dirname "$(readlink -f "$0")")"
-exec "$APPDIR/usr/bin/echo" "$@"
+exec "$APPDIR/usr/bin/echo-music" "$@"

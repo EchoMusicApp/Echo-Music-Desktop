@@ -20,7 +20,7 @@ SKIP_FLUTTER_BUILD=false
 
 # Version from pubspec.yaml
 VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//;s/+.*//;s/ *$//')
-echo "Building Echo $VERSION"
+echo "Building Echo Music $VERSION"
 
 BUNDLE="$REPO_ROOT/build/linux/x64/release/bundle"
 if [ "$SKIP_FLUTTER_BUILD" = true ]; then
@@ -41,7 +41,7 @@ rm -rf "$STAGING"
 mkdir -p "$STAGING/usr/bin/lib" "$STAGING/usr/bin/data"
 
 # --- Staging: binary, libs, data (all under usr/bin so engine finds them) ---
-cp "$BUNDLE/echo" "$STAGING/usr/bin/echo"
+cp "$BUNDLE/echo-music" "$STAGING/usr/bin/echo-music"
 cp -a "$BUNDLE/lib/"* "$STAGING/usr/bin/lib/" 2>/dev/null || true
 cp -a "$BUNDLE/data/"* "$STAGING/usr/bin/data/"
 
@@ -55,18 +55,17 @@ for lib in libmpv libmimalloc; do
   done
 done
 
-patchelf --set-rpath '$ORIGIN/lib' "$STAGING/usr/bin/echo"
-chmod +x "$STAGING/usr/bin/echo"
+patchelf --set-rpath '$ORIGIN/lib' "$STAGING/usr/bin/echo-music"
+chmod +x "$STAGING/usr/bin/echo-music"
 
-# .deb/.rpm: same layout, binary named echo-music to avoid conflict with coreutils
+# .deb/.rpm: same layout
 PKG_STAGING="$REPO_ROOT/build/linux_pkg_staging_named"
 rm -rf "$PKG_STAGING"
 mkdir -p "$PKG_STAGING/usr/bin/lib" "$PKG_STAGING/usr/bin/data" \
   "$PKG_STAGING/usr/share/applications" "$PKG_STAGING/usr/share/icons/hicolor/256x256/apps"
-cp "$STAGING/usr/bin/echo" "$PKG_STAGING/usr/bin/echo-music"
 cp -a "$STAGING/usr/bin/lib/"* "$PKG_STAGING/usr/bin/lib/"
 cp -a "$STAGING/usr/bin/data/"* "$PKG_STAGING/usr/bin/data/"
-cp "$REPO_ROOT/icons/Echo_nobg.png" "$PKG_STAGING/usr/share/icons/hicolor/256x256/apps/echo.png"
+cp "$REPO_ROOT/icons/Echo_nobg.png" "$PKG_STAGING/usr/share/icons/hicolor/256x256/apps/echo-music.png"
 cp "$REPO_ROOT/linux/packaging/echo-music.desktop" "$PKG_STAGING/usr/share/applications/echo-music.desktop"
 patchelf --set-rpath '$ORIGIN/lib' "$PKG_STAGING/usr/bin/echo-music"
 chmod +x "$PKG_STAGING/usr/bin/echo-music"
@@ -74,13 +73,13 @@ chmod +x "$PKG_STAGING/usr/bin/echo-music"
 echo "Staging ready at $STAGING"
 
 # --- AppImage ---
-APPDIR="$REPO_ROOT/build/Echo.AppDir"
+APPDIR="$REPO_ROOT/build/Echo-Music.AppDir"
 rm -rf "$APPDIR"
 mkdir -p "$APPDIR/usr" "$APPDIR/usr/share/icons/hicolor/256x256/apps"
 cp -a "$STAGING/usr/bin" "$APPDIR/usr/"
-cp "$REPO_ROOT/icons/Echo_nobg.png" "$APPDIR/usr/share/icons/hicolor/256x256/apps/echo.png"
-cp "$REPO_ROOT/icons/Echo_nobg.png" "$APPDIR/echo.png"
-cp "$REPO_ROOT/linux/packaging/echo.desktop" "$APPDIR/echo.desktop"
+cp "$REPO_ROOT/icons/Echo_nobg.png" "$APPDIR/usr/share/icons/hicolor/256x256/apps/echo-music.png"
+cp "$REPO_ROOT/icons/Echo_nobg.png" "$APPDIR/echo-music.png"
+cp "$REPO_ROOT/linux/packaging/echo-music.desktop" "$APPDIR/echo-music.desktop"
 cp "$REPO_ROOT/linux/packaging/AppRun" "$APPDIR/AppRun"
 chmod +x "$APPDIR/AppRun"
 
@@ -96,8 +95,8 @@ else
   chmod +x "$REPO_ROOT/build/appimagetool.AppImage"
   APPIMAGETOOL="$REPO_ROOT/build/appimagetool.AppImage"
 fi
-ARCH=x86_64 "$APPIMAGETOOL" -n "$APPDIR" "$REPO_ROOT/build/Echo-${VERSION}-x86_64.AppImage"
-echo "Built: build/Echo-${VERSION}-x86_64.AppImage"
+ARCH=x86_64 "$APPIMAGETOOL" -n "$APPDIR" "$REPO_ROOT/build/Echo-Music-${VERSION}-x86_64.AppImage"
+echo "Built: build/Echo-Music-${VERSION}-x86_64.AppImage"
 
 # --- .deb ---
 if command -v dpkg-deb &>/dev/null; then
@@ -105,7 +104,7 @@ if command -v dpkg-deb &>/dev/null; then
   rm -rf "$PKG"
   mkdir -p "$PKG/DEBIAN" "$PKG/usr/share/applications" "$PKG/usr/share/icons/hicolor/256x256/apps"
   cp -a "$PKG_STAGING/usr/bin" "$PKG/usr/"
-  cp "$REPO_ROOT/icons/Echo_nobg.png" "$PKG/usr/share/icons/hicolor/256x256/apps/echo.png"
+  cp "$REPO_ROOT/icons/Echo_nobg.png" "$PKG/usr/share/icons/hicolor/256x256/apps/echo-music.png"
   cp "$REPO_ROOT/linux/packaging/echo-music.desktop" "$PKG/usr/share/applications/echo-music.desktop"
   sed "s/VERSION/$VERSION/" "$REPO_ROOT/linux/packaging/control.in" > "$PKG/DEBIAN/control"
   dpkg-deb --root-owner-group --build "$PKG" "$REPO_ROOT/build/echo-music_${VERSION}_amd64.deb"
