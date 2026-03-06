@@ -1,8 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Echo Music
-Comment=Music player
-Exec=echo
-Icon=echo
-Categories=AudioVideo;Audio;Music;Player;
-StartupWMClass=echo

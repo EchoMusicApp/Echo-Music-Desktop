@@ -89,12 +89,12 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.echo" "\0"
+            VALUE "CompanyName", "com.echo.music" "\0"
             VALUE "FileDescription", "Echo Music" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "echo" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.echo. All rights reserved." "\0"
-            VALUE "OriginalFilename", "echo_music.exe" "\0"
+            VALUE "InternalName", "echo-music" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 com.echo.music. All rights reserved." "\0"
+            VALUE "OriginalFilename", "echo-music.exe" "\0"
             VALUE "ProductName", "Echo Music" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
