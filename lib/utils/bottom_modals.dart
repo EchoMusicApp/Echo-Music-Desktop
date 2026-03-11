@@ -1744,7 +1744,7 @@ class BottomModalLayout extends StatelessWidget {
       width: double.maxFinite,
       constraints: const BoxConstraints(maxWidth: 600),
       child: Material(
-        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        color: Color.fromARGB(245, 32, 32, 32),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),

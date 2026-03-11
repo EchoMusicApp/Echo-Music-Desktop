@@ -11,7 +11,7 @@ class BottomMessage {
         content: Text(
           text,
           style: smallTextStyle(context, bold: false, opacity: 0.8).copyWith(
-            color: AdaptiveTheme.of(context).inactiveBackgroundColor,
+            color: Theme.of(context).colorScheme.onPrimary,
           ),
         ),
         duration: duration,
