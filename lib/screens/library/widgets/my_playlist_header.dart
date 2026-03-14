@@ -114,6 +114,35 @@ class MyPlayistHeader extends StatelessWidget {
                     ],
                   ),
                 ),
+
+                if (playlist['songs'].isNotEmpty)
+                AdaptiveFilledButton(
+                  onPressed: () {
+                    List<Map<dynamic, dynamic>> shuffledSongs = List<Map<dynamic, dynamic>>.from(playlist['songs']);
+                    shuffledSongs.shuffle();
+                    GetIt.I<MediaPlayer>().playAll(shuffledSongs);
+                  },
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(Platform.isWindows ? 8 : 35),
+                  ),
+                  color: context.isDarkMode ? Colors.white : Colors.black,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.shuffle,
+                        color: context.isDarkMode ? Colors.black : Colors.white,
+                        size: 24,
+                      ),
+                      const SizedBox(width: 8),
+                      const Text("Shuffle", style: TextStyle(fontSize: 18))
+                    ],
+                  ),
+                ),
             ],
           )
         ],
