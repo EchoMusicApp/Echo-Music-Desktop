@@ -239,7 +239,7 @@ Widget _backupActionButton(
     child: Text(
       label,
       style: TextStyle(
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color: Theme.of(context).colorScheme.onPrimary,
       ),
     ),
   );
