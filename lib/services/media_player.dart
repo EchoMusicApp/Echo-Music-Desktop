@@ -670,41 +670,118 @@ class MediaPlayer extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _shuffleRemainingQueue() async {
-    final currentIndex = _player.currentIndex;
-    if (currentIndex == null) return;
-    final totalSources = _player.sequence?.length ?? 0;
-    if (currentIndex + 1 >= totalSources) return;
-
-    final List<AudioSource> remainingSources = [];
-    for (int i = currentIndex + 1; i < totalSources; i++) {
-      remainingSources.add(_player.audioSources[i]);
+  Future<AudioSource> _cloneSource(AudioSource source, Map<String, dynamic> song) async {
+    if (source is UriAudioSource) {
+      return AudioSource.uri(source.uri, tag: source.tag);
     }
+    return await _getAudioSource(song);
+  }
 
-    await _player.removeAudioSourceRange(currentIndex + 1, totalSources);
-    remainingSources.shuffle();
-    await _player.addAudioSources(remainingSources);
+  Future<void> _shuffleRemainingQueue() async {
+    try {
+      final currentSong = _currentSongNotifier.value;
+      if (currentSong == null) return;
+      final currentIndex = _player.currentIndex;
+      if (currentIndex == null) return;
+      final currentPosition = _player.position;
+
+      final allSources = List<IndexedAudioSource>.from(_player.sequence ?? []);
+      if (allSources.isEmpty || currentIndex + 1 >= allSources.length) return;
+
+      final beforeSources = allSources.sublist(0, currentIndex);
+      final remainingSources = allSources.sublist(currentIndex + 1);
+
+      // Create new fresh AudioSource objects for beforeSources
+      final List<AudioSource> newBeforeSources = [];
+      for (int i = 0; i < beforeSources.length; i++) {
+        final src = beforeSources[i];
+        final song = _originalPlaylist.firstWhere(
+          (s) => s['videoId'] == (src.tag as MediaItem).id,
+          orElse: () => <String, dynamic>{},
+        );
+        newBeforeSources.add(await _cloneSource(src, song));
+      }
+
+      // Create new fresh AudioSource objects for remainingSources
+      final List<AudioSource> newRemainingSources = [];
+      for (int i = 0; i < remainingSources.length; i++) {
+        final src = remainingSources[i];
+        final song = _originalPlaylist.firstWhere(
+          (s) => s['videoId'] == (src.tag as MediaItem).id,
+          orElse: () => <String, dynamic>{},
+        );
+        newRemainingSources.add(await _cloneSource(src, song));
+      }
+
+      // Shuffle the remaining ones
+      newRemainingSources.shuffle();
+
+      // Current source cloned
+      final currentSrc = allSources[currentIndex];
+      final currentSongMap = _originalPlaylist.firstWhere(
+        (s) => s['videoId'] == (currentSrc.tag as MediaItem).id,
+        orElse: () => <String, dynamic>{},
+      );
+      final newCurrentSource = await _cloneSource(currentSrc, currentSongMap);
+
+      final newSources = [...newBeforeSources, newCurrentSource, ...newRemainingSources];
+
+      await _player.setAudioSource(
+        ConcatenatingAudioSource(children: newSources),
+        initialIndex: currentIndex,
+        initialPosition: currentPosition,
+      );
+    } catch (e) {
+      print("Error shuffling remaining queue: $e");
+    }
   }
 
   Future<void> _restoreOriginalQueueOrder() async {
-    final currentSong = _currentSongNotifier.value;
-    if (currentSong == null) return;
+    try {
+      final currentSong = _currentSongNotifier.value;
+      if (currentSong == null) return;
+      final currentPosition = _player.position;
 
-    final origIndex = _originalPlaylist.indexWhere((song) => song['videoId'] == currentSong.id);
-    if (origIndex == -1) return;
+      final allSources = List<IndexedAudioSource>.from(_player.sequence ?? []);
 
-    final remainingSongs = _originalPlaylist.sublist(origIndex + 1);
+      final sourceMap = <String, IndexedAudioSource>{};
+      for (var source in allSources) {
+        final tag = source.tag;
+        if (tag is MediaItem) {
+          sourceMap[tag.id] = source;
+        }
+      }
 
-    final currentIndex = _player.currentIndex ?? 0;
-    final totalSources = _player.sequence?.length ?? 0;
+      final usedSources = <IndexedAudioSource>{};
+      final List<AudioSource> originalSources = [];
+      for (var song in _originalPlaylist) {
+        final videoId = song['videoId'];
+        final source = sourceMap[videoId];
+        if (source != null && !usedSources.contains(source)) {
+          originalSources.add(await _cloneSource(source, song));
+          usedSources.add(source);
+        } else {
+          final newSource = await _getAudioSource(song);
+          originalSources.add(newSource);
+        }
+      }
 
-    if (currentIndex + 1 < totalSources) {
-      await _player.removeAudioSourceRange(currentIndex + 1, totalSources);
-    }
+      final origIndex = originalSources.indexWhere((source) {
+        if (source is IndexedAudioSource) {
+          final tag = source.tag;
+          return tag is MediaItem && tag.id == currentSong.id;
+        }
+        return false;
+      });
+      if (origIndex == -1) return;
 
-    if (remainingSongs.isNotEmpty) {
-      final newSources = await Future.wait(remainingSongs.map((song) => _getAudioSource(song)));
-      await _player.addAudioSources(newSources);
+      await _player.setAudioSource(
+        ConcatenatingAudioSource(children: originalSources),
+        initialIndex: origIndex,
+        initialPosition: currentPosition,
+      );
+    } catch (e) {
+      print("Error restoring original queue order: $e");
     }
   }
 }
