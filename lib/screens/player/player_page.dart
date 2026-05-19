@@ -543,12 +543,14 @@ class _PlayerPageState extends State<PlayerPage> {
             // Shuffle
             AdaptiveIconButton(
               onPressed: () {
-                // Toggle shuffle not implemented in UI, just icon for now or placeholder
+                mediaPlayer.setShuffleModeEnabled(!mediaPlayer.shuffleModeEnabled);
               },
               icon: Icon(
                 Icons.shuffle,
                 size: 24,
-                color: Colors.white.withValues(alpha: 0.7),
+                color: mediaPlayer.shuffleModeEnabled
+                    ? Colors.white
+                    : Colors.white.withValues(alpha: 0.7),
               ),
             ),
             // Previous

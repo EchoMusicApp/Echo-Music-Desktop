@@ -20,7 +20,7 @@ dependencies:
   hive_flutter: ^1.1.0
   youtube_explode_dart:
     git:
-      url: https://github.com/iad1tya/youtube_explode_dart
+      url: https://github.com/EchoMusicApp/youtube_explode_dart
   expandable_page_view: ^1.0.17
   get_it: ^8.0.3
   cached_network_image: ^3.3.1
