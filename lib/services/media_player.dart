@@ -310,6 +310,13 @@ class MediaPlayer extends ChangeNotifier {
     GetIt.I<SettingsManager>().skipSilence = value;
   }
 
+  Future<void> setShuffleModeEnabled(bool value) async {
+    if (value) {
+      await _player.shuffle();
+    }
+    await _player.setShuffleModeEnabled(value);
+  }
+
   Future<AudioSource> _getAudioSource(Map<String, dynamic> song) async {
     MediaItem tag = MediaItem(
       id: song['videoId'],
