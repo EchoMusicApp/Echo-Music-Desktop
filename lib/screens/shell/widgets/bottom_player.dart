@@ -42,6 +42,7 @@ class _BottomPlayerState extends State<BottomPlayer> {
   @override
   Widget build(BuildContext context) {
     final mediaPlayer = GetIt.I<MediaPlayer>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return StreamBuilder(
         stream: mediaPlayer.currentTrackStream,
         builder: (
@@ -54,30 +55,40 @@ class _BottomPlayerState extends State<BottomPlayer> {
             return const SizedBox(); // or loading indicator
           }
           return ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 500),
+            constraints: const BoxConstraints(maxWidth: 600),
             child: GestureDetector(
               onTap: () {
                 context.push('/player');
               },
               child: Container(
-                margin: const EdgeInsets.only(bottom: 10),
+                margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
                 decoration: BoxDecoration(
-                  color: (backgroundColor ?? const Color(0xFF202020)).withAlpha(255),
-                  borderRadius: BorderRadius.circular(50),
+                  borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 20,
+                      color: Colors.black.withValues(alpha: 0.15),
+                      blurRadius: 24,
                       spreadRadius: 2,
-                      offset: const Offset(0, 5),
+                      offset: const Offset(0, 8),
                     ),
                   ],
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(50),
-                  child: Padding(
+                  borderRadius: BorderRadius.circular(30),
+                  child: BackdropFilter(
+                    filter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: (backgroundColor ?? (isDark ? const Color(0xFF1E1E2E) : const Color(0xFFFFFFFF)))
+                            .withValues(alpha: isDark ? 0.45 : 0.65),
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(
+                          color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.15),
+                          width: 1.2,
+                        ),
+                      ),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 4), // Reduced padding
+                          horizontal: 16, vertical: 8), // Adjusted padding
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -108,10 +119,10 @@ class _BottomPlayerState extends State<BottomPlayer> {
                                         currentSong.title,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 14,
-                                          color: Colors.white,
+                                          color: isDark ? Colors.white : Colors.black87,
                                         ),
                                       ),
                                       if (currentSong.artist != null ||
@@ -126,7 +137,7 @@ class _BottomPlayerState extends State<BottomPlayer> {
                                           style: TextStyle(
                                             fontSize: 12,
                                             color:
-                                                Colors.white.withValues(alpha: 0.8),
+                                                (isDark ? Colors.white : Colors.black87).withValues(alpha: 0.7),
                                           ),
                                         ),
                                     ],
@@ -152,10 +163,10 @@ class _BottomPlayerState extends State<BottomPlayer> {
                                           .player
                                           .seekToPrevious();
                                     },
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.skip_previous,
                                       size: 24,
-                                      color: Colors.white,
+                                      color: isDark ? Colors.white : Colors.black87,
                                     ),
                                   );
                                 },
@@ -189,7 +200,7 @@ class _BottomPlayerState extends State<BottomPlayer> {
                                                 ? Icons.pause
                                                 : Icons.play_arrow,
                                             size: 30, // Slightly smaller play button
-                                            color: Colors.white,
+                                            color: isDark ? Colors.white : Colors.black87,
                                           ),
                                         );
                                 },
@@ -207,10 +218,10 @@ class _BottomPlayerState extends State<BottomPlayer> {
                                           .player
                                           .seekToNext();
                                     },
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.skip_next,
                                       size: 24,
-                                      color: Colors.white,
+                                      color: isDark ? Colors.white : Colors.black87,
                                     ),
                                   );
                                 },
